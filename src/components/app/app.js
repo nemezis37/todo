@@ -2,28 +2,60 @@ import React from 'react';
 import AppHeader from '../app-header'
 import SearchPanel from '../search-panel'
 import TodoList from '../todo-list'
+import ItemAddForm from '../item-add-form'
 import ItemStatusFilter from '../item-status-filter'
 
 import './app.css'
 
-const App = () => {
+export default class App extends React.Component {
 
-    const todoData =[
-        {label: 'Drink Coffee', important: false, id: 1},
-        {label: 'Make Awesome App', important: true, id: 2},
-        {label: 'Have Lunch', important: false, id: 3}
-    ];
+    maxId = 100;
 
-    return (
-        <div className="todo-app">
-            <AppHeader done={1} todo={2}/>
-            <div className="top-panel d-flex">
-                <SearchPanel/>
-                <ItemStatusFilter/>
+    deleteItem = (id) => {
+        this.setState(
+            ({todoData})=>{
+                const idx = todoData.findIndex((el)=> el.id === id);
+                const newArray = [
+                    ...todoData.slice(0, idx),
+                    ...todoData.slice(idx+1)];
+                return {
+                    todoData : newArray
+                };
+            }
+        );
+    };
+
+    addItem = () => {
+        this.setState(({todoData})=> {
+            const newItem = {label: 'New item', id: this.maxId++};
+            const newArray = [...todoData, newItem];
+            return {
+                todoData: newArray
+            };
+        });
+    };
+
+    state = {
+        todoData:[
+            {label: 'Drink Coffee', id: 1},
+            {label: 'Make Awesome App', id: 2},
+            {label: 'Have Lunch' , id: 3}]
+    };
+
+    render() {
+        const {todoData} = this.state;
+        return (
+            <div className="todo-app">
+                <AppHeader done={1} todo={2}/>
+                <div className="top-panel d-flex">
+                    <SearchPanel/>
+                    <ItemStatusFilter/>
+                </div>
+                <TodoList todos={todoData} onDeleted={this.deleteItem}/>
+                <ItemAddForm
+                    onClick = {this.addItem}
+                />
             </div>
-            <TodoList todos={todoData}/>
-        </div>
-    );
+        );
+    }
 };
-
-export default App;
