@@ -12,7 +12,7 @@ export default class App extends React.Component {
     maxId = 100;
 
     createToDoItem(label){
-        return {label: label, id: this.maxId++, important:false, done: false};
+        return {label: label, id: this.maxId++, important:false, done: false, visible: true};
     }
 
     deleteItem = (id) => {
@@ -70,12 +70,24 @@ export default class App extends React.Component {
         });
     };
 
+    onSearchInputChange = (searchTerm) => {
+        this.setState(({todoData})=>{
+            const newArray = todoData.map( (item) => {
+                return {...item, visible : item.label.toLowerCase().includes(searchTerm.toLowerCase())}
+                    }
+                );
+            return {
+                todoData: newArray
+            }
+        })
+    };
+
     state = {
-        todoData:[
+        todoData: [
             this.createToDoItem('Drink Coffee'),
             this.createToDoItem('Make Awesome App'),
             this.createToDoItem('Have Lunch')
-            ]
+        ]
     };
 
     render() {
@@ -86,7 +98,8 @@ export default class App extends React.Component {
             <div className="todo-app">
                 <AppHeader done={doneCount} todo={todoCount}/>
                 <div className="top-panel d-flex">
-                    <SearchPanel/>
+                    <SearchPanel
+                    onSearchInputChange={this.onSearchInputChange}/>
                     <ItemStatusFilter/>
                 </div>
                 <TodoList
