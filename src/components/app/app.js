@@ -12,7 +12,7 @@ export default class App extends React.Component {
     maxId = 100;
 
     createToDoItem(label){
-        return {label: label, id: this.maxId++, important:false, done: false, visible: true};
+        return {label: label, id: this.maxId++, important:false, done: false};
     }
 
     deleteItem = (id) => {
@@ -71,15 +71,11 @@ export default class App extends React.Component {
     };
 
     onSearchInputChange = (searchTerm) => {
-        this.setState(({todoData})=>{
-            const newArray = todoData.map( (item) => {
-                return {...item, visible : item.label.toLowerCase().includes(searchTerm.toLowerCase())}
-                    }
-                );
-            return {
-                todoData: newArray
-            }
-        })
+        this.setState({searchTerm: searchTerm});
+    };
+
+    onStatusFilterChange = (activeStatusTab) => {
+        this.setState({activeStatusTab: activeStatusTab})
     };
 
     state = {
@@ -87,11 +83,13 @@ export default class App extends React.Component {
             this.createToDoItem('Drink Coffee'),
             this.createToDoItem('Make Awesome App'),
             this.createToDoItem('Have Lunch')
-        ]
+        ],
+        searchTerm:'',
+        activeStatusTab: 'All'
     };
 
     render() {
-        const {todoData} = this.state;
+        const {todoData, searchTerm,  activeStatusTab } = this.state;
         var doneCount = todoData.filter((el)=>el.done).length;
         var todoCount = todoData.length - doneCount;
         return (
@@ -100,13 +98,17 @@ export default class App extends React.Component {
                 <div className="top-panel d-flex">
                     <SearchPanel
                     onSearchInputChange={this.onSearchInputChange}/>
-                    <ItemStatusFilter/>
+                    <ItemStatusFilter
+                        onStatusFilterChange={this.onStatusFilterChange}
+                        activeTab = {this.state.activeStatusTab}/>
                 </div>
                 <TodoList
                     todos={todoData}
                     onDeleted={this.deleteItem}
                     onToggleImportant={this.onToggleImportant}
-                    onToggleDone={this.onToggleDone}/>
+                    onToggleDone={this.onToggleDone}
+                    searchTerm={searchTerm}
+                    activeStatusTab={activeStatusTab}/>
                 <ItemAddForm
                     onClick = {this.addItem}
                 />
